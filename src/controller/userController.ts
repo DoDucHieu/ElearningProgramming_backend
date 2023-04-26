@@ -8,20 +8,27 @@ const getAllUser = async (req: Request, res: Response) => {
     const page: number = Number(req.query.page);
     const size: number = Number(req.query.size);
     const keyword: any = req.query.keyword || "";
-    const resultTotal = await User.find({
-      $or: [{ email: { $regex: keyword } }],
-    });
+    let totalRecord = null;
+
     const result = await User.find({
       $or: [{ email: { $regex: keyword } }],
     })
       .skip(size * (page - 1))
       .limit(size);
-    if (result && resultTotal) {
+
+    if (keyword)
+      totalRecord = await User.count({
+        $or: [{ email: { $regex: keyword } }],
+      })
+        .skip(size * (page - 1))
+        .limit(size);
+    else totalRecord = await User.count({});
+    if (result) {
       return res.status(200).json({
         errCode: 0,
         errMessage: "Get all user success!",
         data: result,
-        totalRecord: resultTotal.length,
+        totalRecord,
       });
     } else {
       throw new Error("There are no user!");

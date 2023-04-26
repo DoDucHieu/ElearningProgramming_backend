@@ -9,9 +9,13 @@ import assessmentController from "../controller/assessmentController";
 import categoryController from "../controller/categoryController";
 import accessRightController from "../controller/accessRightController";
 import newController from "../controller/newController";
+import videoController from "../controller/videoController";
 import pageController from "../controller/pageController";
 import orderController from "../controller/orderController";
 import paymentController from "../controller/paymentController";
+import courseController from "../controller/courseController";
+import lessonController from "../controller/lessonController";
+import myCourseController from "../controller/myCourseController";
 
 const routes = (app: Express) => {
   app.get("/", (req: Request, res: Response) => {
@@ -217,6 +221,89 @@ const routes = (app: Express) => {
     newController.approveNew
   );
   app.put("/increase-view-new", newController.increaseView);
+
+  // video api
+  app.get("/get-all-video", videoController.getAllVideo);
+  app.get("/get-detail-video", videoController.getDetailVideo);
+  app.post("/add-video", middleWare.verifyToken, videoController.addVideo);
+  app.put(
+    "/edit-video",
+    middleWare.verifyTokenAdmin,
+    videoController.editVideo
+  );
+  app.delete(
+    "/delete-video",
+    middleWare.verifyToken,
+    videoController.deleteVideo
+  );
+  app.put(
+    "/approve-video",
+    middleWare.verifyTokenAdmin,
+    videoController.approveVideo
+  );
+  app.put("/increase-view-video", videoController.increaseView);
+
+  // course api
+  app.get("/get-all-course", courseController.getAllCourse);
+  app.get("/get-all-free-course", courseController.getAllFreeCourse);
+  app.get("/get-all-pro-course", courseController.getAllProCourse);
+  app.get("/get-detail-course", courseController.getDetailCourse);
+  app.post("/add-course", middleWare.verifyToken, courseController.addCourse);
+  app.put(
+    "/edit-course",
+    middleWare.verifyTokenAdmin,
+    courseController.editCourse
+  );
+  app.delete(
+    "/delete-course",
+    middleWare.verifyToken,
+    courseController.deleteCourse
+  );
+  app.put("/increase-registry-course", courseController.increaseRegistryCourse);
+
+  // lesson api
+  app.get("/get-all-lesson", lessonController.getAllLesson);
+  app.get("/get-detail-lesson", lessonController.getDetailLesson);
+  app.post("/add-lesson", middleWare.verifyToken, lessonController.addLesson);
+  app.put(
+    "/edit-lesson",
+    middleWare.verifyTokenAdmin,
+    lessonController.editLesson
+  );
+  app.delete(
+    "/delete-lesson",
+    middleWare.verifyToken,
+    lessonController.deleteLesson
+  );
+
+  // my-course api
+  app.get(
+    "/get-all-my-course",
+    middleWare.verifyToken,
+    myCourseController.getAllMyCourse
+  );
+  app.post(
+    "/registry-course",
+    middleWare.verifyToken,
+    myCourseController.registryCourse
+  );
+  app.delete(
+    "/delete-my-course",
+    middleWare.verifyToken,
+    myCourseController.deleteMyCourse
+  );
+
+  app.delete(
+    "/delete-all-my-course",
+    middleWare.verifyToken,
+    myCourseController.deleteAllMyCourse
+  );
+
+  app.get(
+    "/get-detail-my-course",
+    middleWare.verifyToken,
+    myCourseController.getDetailMyCourse
+  );
 
   // page api
   app.get("/get-all-page", middleWare.verifyToken, pageController.getAllPage);

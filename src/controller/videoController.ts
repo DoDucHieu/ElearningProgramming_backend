@@ -1,34 +1,33 @@
-import New from "../model/new";
+import Video from "../model/video";
 import { Request, Response } from "express";
 
-const getAllNew = async (req: Request, res: Response) => {
+const getAllVideo = async (req: Request, res: Response) => {
   try {
     const page: number = Number(req.query.page);
     const size: number = Number(req.query.size);
     const keyword: any = req.query.keyword || "";
     let totalRecord = null;
-
-    const result = await New.find({ $or: [{ name: { $regex: keyword } }] })
+    const result = await Video.find({ $or: [{ name: { $regex: keyword } }] })
       .skip(size * (page - 1))
       .limit(size);
 
     if (keyword)
-      totalRecord = await New.count({
+      totalRecord = await Video.count({
         $or: [{ name: { $regex: keyword } }],
       })
         .skip(size * (page - 1))
         .limit(size);
-    else totalRecord = await New.count({});
+    else totalRecord = await Video.count({});
 
     if (result) {
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Lấy tất cả bài đăng thành công!",
+        errMessage: "Lấy tất cả video thành công!",
         data: result,
         totalRecord,
       });
     } else {
-      throw new Error("Bài đăng không tồn tại!");
+      throw new Error("Video không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -38,18 +37,18 @@ const getAllNew = async (req: Request, res: Response) => {
   }
 };
 
-const getDetailNew = async (req: Request, res: Response) => {
+const getDetailVideo = async (req: Request, res: Response) => {
   try {
     const _id = req.query._id;
-    const result = await New.findById({ _id });
+    const result = await Video.findById({ _id });
     if (result) {
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Xem chi tiết bài đăng thành công!",
+        errMessage: "Xem chi tiết video thành công!",
         data: result,
       });
     } else {
-      throw new Error("Bài đăng không tồn tại!");
+      throw new Error("Video không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -59,19 +58,19 @@ const getDetailNew = async (req: Request, res: Response) => {
   }
 };
 
-const deleteNew = async (req: Request, res: Response) => {
+const deleteVideo = async (req: Request, res: Response) => {
   try {
     const _id = req.query._id;
-    const result = await New.findOneAndDelete({
+    const result = await Video.findOneAndDelete({
       _id,
     });
     if (result) {
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Xóa bài đăng thành công!",
+        errMessage: "Xóa video thành công!",
       });
     } else {
-      throw new Error("Bài đăng không tồn tại!");
+      throw new Error("Video không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -81,15 +80,14 @@ const deleteNew = async (req: Request, res: Response) => {
   }
 };
 
-const addNew = async (req: Request, res: Response) => {
+const addVideo = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const result = await New.create({
+    const result = await Video.create({
       name: data.name,
       description: data.description,
-      contentMarkdown: data.contentMarkdown,
-      contentHTML: data.contentHTML,
       img_url: data.img_url,
+      video_url: data.video_url,
       author: data.author,
       is_approved: false,
       view: 0,
@@ -97,7 +95,7 @@ const addNew = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       errCode: 0,
-      errMessage: "Đăng bài thành công, đang chờ duyệt!",
+      errMessage: "Đăng video thành công, đang chờ duyệt!",
       data: result,
     });
   } catch (e) {
@@ -108,25 +106,24 @@ const addNew = async (req: Request, res: Response) => {
   }
 };
 
-const editNew = async (req: Request, res: Response) => {
+const editVideo = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const result = await New.findById({ _id: data._id });
+    const result = await Video.findById({ _id: data._id });
     if (result) {
       result.name = data.name;
       result.description = data.description;
-      result.contentMarkdown = data.contentMarkdown;
-      result.contentHTML = data.contentHTML;
       result.author = data.author;
       result.img_url = data.img_url;
+      result.video_url = data.video_url;
       await result.save();
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Chỉnh sửa bài đăng thành công!",
+        errMessage: "Chỉnh sửa video thành công!",
         data: result,
       });
     } else {
-      throw new Error("Bài đăng không tồn tại!");
+      throw new Error("Video không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -136,20 +133,20 @@ const editNew = async (req: Request, res: Response) => {
   }
 };
 
-const approveNew = async (req: Request, res: Response) => {
+const approveVideo = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const result = await New.findById({ _id: data._id });
+    const result = await Video.findById({ _id: data._id });
     if (result) {
       result.is_approved = true;
       await result.save();
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Phê duyệt bài đăng thành công!",
+        errMessage: "Phê duyệt video thành công!",
         data: result,
       });
     } else {
-      throw new Error("Bài đăng không tồn tại!");
+      throw new Error("Video không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -162,7 +159,7 @@ const approveNew = async (req: Request, res: Response) => {
 const increaseView = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const result = await New.findById({ _id: data._id });
+    const result = await Video.findById({ _id: data._id });
     if (result && result.is_approved) {
       result.view += 1;
       await result.save();
@@ -172,7 +169,7 @@ const increaseView = async (req: Request, res: Response) => {
         data: result,
       });
     } else {
-      throw new Error("Bài đăng không tồn tại!");
+      throw new Error("Video không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -182,14 +179,14 @@ const increaseView = async (req: Request, res: Response) => {
   }
 };
 
-const newController = {
-  getAllNew,
-  getDetailNew,
-  addNew,
-  deleteNew,
-  editNew,
-  approveNew,
+const videoController = {
+  getAllVideo,
+  getDetailVideo,
+  addVideo,
+  deleteVideo,
+  editVideo,
+  approveVideo,
   increaseView,
 };
 
-export default newController;
+export default videoController;

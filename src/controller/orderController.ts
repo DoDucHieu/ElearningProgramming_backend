@@ -6,20 +6,28 @@ const getAllOrder = async (req: Request, res: Response) => {
     const page: number = Number(req.query.page);
     const size: number = Number(req.query.size);
     const keyword: any = req.query.keyword || "";
-    const resultTotal = await Order.find({
-      $or: [{ email: { $regex: keyword } }],
-    });
+    let totalRecord = null;
+
     const result = await Order.find({
       $or: [{ email: { $regex: keyword } }],
     })
       .skip(size * (page - 1))
       .limit(size);
-    if (result && resultTotal)
+
+    if (keyword)
+      totalRecord = await Order.count({
+        $or: [{ email: { $regex: keyword } }],
+      })
+        .skip(size * (page - 1))
+        .limit(size);
+    else totalRecord = await Order.count({});
+
+    if (result && totalRecord)
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Get all order success!",
+        errMessage: "Lấy tất cả đơn hàng thành công!",
         data: result,
-        totalRecord: resultTotal.length,
+        totalRecord,
       });
   } catch (e) {
     return res.status(500).json({
@@ -34,16 +42,14 @@ const AddOrder = async (req: Request, res: Response) => {
     const orderData = req.body;
     const result = await Order.create({
       email: orderData.email,
-      listProduct: orderData.listProduct,
-      shipFee: orderData.shipFee,
-      paymentMethod: orderData.paymentMethod ?? false,
-      receiveAddress: orderData.receiveAddress,
-      isPurchase: false,
+      list_course: orderData.list_course,
+      payment_method: orderData.payment_method,
+      is_purchase: false,
     });
     if (result) {
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Add order success!",
+        errMessage: "Thêm đơn hàng thành công!",
         data: result,
       });
     }
@@ -60,11 +66,11 @@ const deleteOrder = async (req: Request, res: Response) => {
     const data = req.query;
     const result = await Order.findOneAndDelete({
       email: data?.email,
-      _id: data?.orderId,
+      _id: data?.order_id,
     });
     return res.status(200).json({
       errCode: 0,
-      errMessage: "Delete order success!",
+      errMessage: "Xóa đơn hàng thành công!",
       data: result,
     });
   } catch (e) {
@@ -83,17 +89,14 @@ const editOrder = async (req: Request, res: Response) => {
       _id: orderData.orderId,
     });
     if (result) {
-      if (orderData.receiveAddress)
-        result.receiveAddress = orderData.receiveAddress;
-      if (orderData.listProduct) result.listProduct = orderData.listProduct;
-      if (orderData.shipFee) result.shipFee = orderData.shipFee;
-      if (orderData.paymentMethod)
-        result.paymentMethod = orderData.paymentMethod;
-      if (orderData.isPurchase) result.isPurchase = orderData.isPurchase;
+      if (orderData.list_course) result.list_course = orderData.list_course;
+      if (orderData.payment_method)
+        result.payment_method = orderData.payment_method;
+      if (orderData.is_purchase) result.is_purchase = orderData.is_purchase;
       await result.save();
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Edit order success!",
+        errMessage: "Cập nhật đơn hàng thành công!",
         data: orderData,
       });
     }

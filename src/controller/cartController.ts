@@ -7,7 +7,7 @@ const getAllCartByEmail = async (req: Request, res: Response) => {
     const result = await Cart.find(
       { email: email },
       { createdAt: 0, updatedAt: 0, userName: 0 }
-    ).populate("productId", { createdAt: 0, updatedAt: 0 });
+    ).populate("course_id", { createdAt: 0, updatedAt: 0 });
     return res.status(200).json({
       errCode: 0,
       errMessage: "Get all cart success!",
@@ -26,25 +26,22 @@ const AddOrUpdateCart = async (req: Request, res: Response) => {
     const cartData = req.body;
     const result = await Cart.findOne({
       email: cartData.email,
-      productId: cartData.productId,
+      course_id: cartData.course_id,
     });
     if (result) {
-      result.quantity = Number(result.quantity) + Number(cartData.quantity);
-      await result.save();
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Update cart success!",
+        errMessage: "Khóa học này đã có trong giỏ hàng!",
         data: result,
       });
     } else {
       const rs = await Cart.create({
         email: cartData.email,
-        productId: cartData.productId,
-        quantity: cartData.quantity,
+        course_id: cartData.course_id,
       });
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Add to cart success!",
+        errMessage: "Thêm vào giỏ hàng thành công!",
         data: rs,
       });
     }
@@ -61,11 +58,11 @@ const removeFromCart = async (req: Request, res: Response) => {
     const cartData = req.query;
     const result = await Cart.findOneAndDelete({
       email: cartData.email,
-      productId: cartData.productId,
+      course_id: cartData.course_id,
     });
     return res.status(200).json({
       errCode: 0,
-      errMessage: "Delete from cart success!",
+      errMessage: "Đã xóa khóa học khỏi giỏ hàng!",
       data: result,
     });
   } catch (e) {
@@ -84,7 +81,7 @@ const deleteAllCartByEmail = async (req: Request, res: Response) => {
     });
     return res.status(200).json({
       errCode: 0,
-      errMessage: "Delete all cart success!",
+      errMessage: "Đã xóa tất cả khóa học trong giỏ hàng!",
       data: result,
     });
   } catch (e) {

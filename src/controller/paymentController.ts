@@ -13,12 +13,12 @@ const formatLineItem = (data: any) => {
       price_data: {
         currency: "usd",
         product_data: {
-          name: item?.productName,
-          images: [item?.imgUrl],
+          name: item?.name,
+          images: [item?.img_url],
         },
         unit_amount: item?.price,
       },
-      quantity: item?.quantity,
+      quantity: 1,
     };
   });
   return arr;
@@ -27,11 +27,13 @@ const formatLineItem = (data: any) => {
 const checkOut = async (req: Request, res: Response) => {
   try {
     const data = req.body;
+    console.log("data:", data);
+
     const session = await stripe.checkout.sessions.create({
-      line_items: formatLineItem(data.listProduct),
+      line_items: formatLineItem(data.list_course),
       mode: "payment",
-      success_url: `http://localhost:3000/payment-success/${data?.orderId}`,
-      cancel_url: `http://localhost:3000/payment-cancel/${data?.orderId}`,
+      success_url: `http://localhost:3000/payment-success/${data?.order_id}`,
+      cancel_url: `http://localhost:3000/payment-cancel/${data?.order_id}`,
     });
 
     return res.status(200).json({

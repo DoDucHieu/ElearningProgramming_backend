@@ -11,22 +11,22 @@ const getAllComment = async (req: Request, res: Response) => {
     let result = null;
     result = await Comment.find({
       new_id: data._id,
-    }).populate("email", { createdAt: 0, updatedAt: 0 });
-    // if (data.type === "new") {
-    //   result = await Comment.find({
-    //     new_id: data._id,
-    //   }).populate("email", { createdAt: 0, updatedAt: 0 });
-    // } else if (data.type === "video") {
-    //   result = await Comment.find({
-    //     video_id: data._id,
-    //   });
-    // } else if (data.type === "lesson") {
-    //   result = await Comment.find({
-    //     lesson_id: data._id,
-    //   });
-    // } else {
-    //   result = await Comment.find({});
-    // }
+    });
+    if (data.type === "new") {
+      result = await Comment.find({
+        new_id: data._id,
+      }).populate("email", { createdAt: 0, updatedAt: 0 });
+    } else if (data.type === "video") {
+      result = await Comment.find({
+        video_id: data._id,
+      });
+    } else if (data.type === "lesson") {
+      result = await Comment.find({
+        lesson_id: data._id,
+      });
+    } else {
+      result = await Comment.find({});
+    }
     if (result)
       return res.status(200).json({
         errCode: 0,

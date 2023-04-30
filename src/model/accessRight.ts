@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 import mongoose from "mongoose";
 
-const historySchema = new Schema(
+const accessRightSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, required: true, ref: "users" },
     accessToken: { type: String },
@@ -13,4 +13,4 @@ const historySchema = new Schema(
   }
 );
 
-export default mongoose.model("accessRights", historySchema);
+export default mongoose.model("accessRights", accessRightSchema);

@@ -10,12 +10,13 @@ import categoryController from "../controller/categoryController";
 import accessRightController from "../controller/accessRightController";
 import newController from "../controller/newController";
 import videoController from "../controller/videoController";
-import pageController from "../controller/pageController";
 import orderController from "../controller/orderController";
 import paymentController from "../controller/paymentController";
 import courseController from "../controller/courseController";
 import lessonController from "../controller/lessonController";
 import myCourseController from "../controller/myCourseController";
+import conversationController from "../controller/conversationController";
+import messageController from "../controller/messageController";
 
 const routes = (app: Express) => {
   app.get("/", (req: Request, res: Response) => {
@@ -63,6 +64,11 @@ const routes = (app: Express) => {
     middleWare.verifyToken,
     userController.getDetailUser
   );
+  app.get(
+    "/get-detail-user-by-id",
+    middleWare.verifyToken,
+    userController.getDetailUserById
+  );
   app.post("/add-user", middleWare.verifyTokenAdmin, userController.addUser);
   app.put("/edit-user", middleWare.verifyToken, userController.editUser);
   app.delete(
@@ -104,6 +110,11 @@ const routes = (app: Express) => {
     "/get-all-order",
     middleWare.verifyToken,
     orderController.getAllOrder
+  );
+  app.get(
+    "/get-detail-order",
+    middleWare.verifyToken,
+    orderController.getDetailOrder
   );
   app.post("/add-order", middleWare.verifyToken, orderController.AddOrder);
   app.post("/edit-order", middleWare.verifyToken, orderController.editOrder);
@@ -259,7 +270,10 @@ const routes = (app: Express) => {
     middleWare.verifyToken,
     courseController.deleteCourse
   );
-  app.put("/increase-registry-course", courseController.increaseRegistryCourse);
+  app.post(
+    "/increase-registry-course",
+    courseController.increaseRegistryCourse
+  );
 
   // lesson api
   app.get("/get-all-lesson", lessonController.getAllLesson);
@@ -293,10 +307,10 @@ const routes = (app: Express) => {
     myCourseController.deleteMyCourse
   );
 
-  app.delete(
-    "/delete-all-my-course",
+  app.post(
+    "/delete-many-my-course",
     middleWare.verifyToken,
-    myCourseController.deleteAllMyCourse
+    myCourseController.deleteManyMyCourse
   );
 
   app.get(
@@ -305,16 +319,49 @@ const routes = (app: Express) => {
     myCourseController.getDetailMyCourse
   );
 
-  // page api
-  app.get("/get-all-page", middleWare.verifyToken, pageController.getAllPage);
+  // conversation api
   app.get(
-    "/get-detail-page",
+    "/get-all-conversation",
     middleWare.verifyToken,
-    pageController.getDetailPage
+    conversationController.getAllConversation
   );
-  app.post("/add-page", middleWare.verifyToken, pageController.createPage);
-  app.put("/update-page", middleWare.verifyToken, pageController.updatePage);
-  app.delete("/delete-page", middleWare.verifyToken, pageController.deletePage);
+  app.get(
+    "/get-detail-conversation",
+    middleWare.verifyToken,
+    conversationController.getDetailConversation
+  );
+  app.post(
+    "/add-conversation",
+    middleWare.verifyToken,
+    conversationController.addConversation
+  );
+  app.put(
+    "/edit-conversation",
+    middleWare.verifyToken,
+    conversationController.editConversation
+  );
+  app.delete(
+    "/delete-conversation",
+    middleWare.verifyToken,
+    conversationController.deleteConversation
+  );
+
+  // message api
+  app.get(
+    "/get-all-message",
+    middleWare.verifyToken,
+    messageController.getAllMessage
+  );
+  app.post(
+    "/add-message",
+    middleWare.verifyToken,
+    messageController.addMessage
+  );
+  app.delete(
+    "/delete-message",
+    middleWare.verifyToken,
+    messageController.deleteMessage
+  );
 };
 
 export default routes;

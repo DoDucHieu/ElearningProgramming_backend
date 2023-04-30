@@ -19,9 +19,7 @@ const getAllUser = async (req: Request, res: Response) => {
     if (keyword)
       totalRecord = await User.count({
         $or: [{ email: { $regex: keyword } }],
-      })
-        .skip(size * (page - 1))
-        .limit(size);
+      });
     else totalRecord = await User.count({});
     if (result) {
       return res.status(200).json({
@@ -58,6 +56,32 @@ const getDetailUser = async (req: Request, res: Response) => {
       });
     } else {
       throw new Error("There is no user!");
+    }
+  } catch (e) {
+    return res.status(500).json({
+      errCode: 1,
+      errMessage: e.message,
+    });
+  }
+};
+
+const getDetailUserById = async (req: Request, res: Response) => {
+  try {
+    const user_id = req.query.user_id;
+    const result = await User.findOne(
+      {
+        _id: user_id,
+      },
+      { password: 0, is_blocked: 0 }
+    );
+    if (result) {
+      return res.status(200).json({
+        errCode: 0,
+        errMessage: "Lấy thông tin chi tiết người dùng thành công!",
+        data: result,
+      });
+    } else {
+      throw new Error("Người dùng không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -172,6 +196,7 @@ const blockUser = async (req: Request, res: Response) => {
 const userController = {
   getAllUser,
   getDetailUser,
+  getDetailUserById,
   addUser,
   editUser,
   deleteUser,

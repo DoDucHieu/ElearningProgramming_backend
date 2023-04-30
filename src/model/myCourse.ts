@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const myCourseSchema = new Schema(
   {
     email: { type: String, required: true, ref: "users" },
-    course_id: { type: String, required: true },
+    course_id: { type: String, required: true, ref: "courses" },
   },
   {
     timestamps: true,

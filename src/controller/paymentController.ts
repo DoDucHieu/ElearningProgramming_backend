@@ -27,8 +27,6 @@ const formatLineItem = (data: any) => {
 const checkOut = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    console.log("data:", data);
-
     const session = await stripe.checkout.sessions.create({
       line_items: formatLineItem(data.list_course),
       mode: "payment",

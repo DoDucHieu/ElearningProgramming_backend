@@ -15,9 +15,7 @@ const getAllNew = async (req: Request, res: Response) => {
     if (keyword)
       totalRecord = await New.count({
         $or: [{ name: { $regex: keyword } }],
-      })
-        .skip(size * (page - 1))
-        .limit(size);
+      });
     else totalRecord = await New.count({});
 
     if (result) {

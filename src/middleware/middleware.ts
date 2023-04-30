@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { RequestHandler } from "express";
-import AccessRight from "../model/history";
+import AccessRight from "../model/accessRight";
 
 const verifyToken: RequestHandler = async (req, res, next) => {
   const header = req.header("Authorization");

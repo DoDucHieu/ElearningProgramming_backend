@@ -4,16 +4,27 @@ import { Request, Response } from "express";
 
 const getAllMyCourse = async (req: Request, res: Response) => {
   try {
+    const page: number = Number(req.query.page);
+    const size: number = Number(req.query.size);
     const email = req.query.email;
+    let totalRecord: number = null;
     const result = await MyCourse.find(
       { email: email },
-      { createdAt: 0, updatedAt: 0, userName: 0 }
-    );
-    return res.status(200).json({
-      errCode: 0,
-      errMessage: "Lấy tất cả khóa học của bạn thành công!",
-      data: result,
-    });
+      { createdAt: 0, updatedAt: 0 }
+    )
+      .populate("course_id", { createdAt: 0, updatedAt: 0 })
+      .skip(size * (page - 1))
+      .limit(size);
+
+    totalRecord = await MyCourse.count({ email: email });
+
+    if (result)
+      return res.status(200).json({
+        errCode: 0,
+        errMessage: "Lấy tất cả khóa học của bạn thành công!",
+        data: result,
+        totalRecord,
+      });
   } catch (e) {
     return res.status(500).json({
       errCode: 1,
@@ -79,15 +90,25 @@ const deleteMyCourse = async (req: Request, res: Response) => {
   }
 };
 
-const deleteAllMyCourse = async (req: Request, res: Response) => {
+const formatDataToDelete = (data: any) => {
+  const res = data?.map((item: any) => {
+    return item?.course_id;
+  });
+  return res;
+};
+
+const deleteManyMyCourse = async (req: Request, res: Response) => {
   try {
-    const email = req.query.email;
+    const email = req.body.email;
+    const listCourse = req.body.list_course;
+    const listCourseId = formatDataToDelete(listCourse);
     const result = await MyCourse.deleteMany({
       email,
+      course_id: { $in: [...listCourseId] },
     });
     return res.status(200).json({
       errCode: 0,
-      errMessage: "Hủy đăn ký tất cả khóa học thành công!",
+      errMessage: "Hủy đăng ký các khóa học thành công!",
       data: result,
     });
   } catch (e) {
@@ -124,7 +145,7 @@ const myCourseController = {
   getAllMyCourse,
   registryCourse,
   deleteMyCourse,
-  deleteAllMyCourse,
+  deleteManyMyCourse,
   getDetailMyCourse,
 };
 export default myCourseController;

@@ -1,3 +1,4 @@
+import myCourse from "../model/myCourse";
 import Order from "../model/order";
 import { Request, Response } from "express";
 
@@ -17,12 +18,10 @@ const getAllOrder = async (req: Request, res: Response) => {
     if (keyword)
       totalRecord = await Order.count({
         $or: [{ email: { $regex: keyword } }],
-      })
-        .skip(size * (page - 1))
-        .limit(size);
+      });
     else totalRecord = await Order.count({});
 
-    if (result && totalRecord)
+    if (result)
       return res.status(200).json({
         errCode: 0,
         errMessage: "Lấy tất cả đơn hàng thành công!",
@@ -37,6 +36,39 @@ const getAllOrder = async (req: Request, res: Response) => {
   }
 };
 
+const getDetailOrder = async (req: Request, res: Response) => {
+  try {
+    const order_id = req.query.order_id;
+    const email = req.query.email;
+    const result = await Order.findOne({
+      _id: order_id,
+      email: email,
+    });
+
+    if (result)
+      return res.status(200).json({
+        errCode: 0,
+        errMessage: "Lấy chi tiết đơn hàng thành công!",
+        data: result,
+      });
+  } catch (e) {
+    return res.status(500).json({
+      errCode: 1,
+      errMessage: e.message,
+    });
+  }
+};
+
+const formatMyCourse = (data: any) => {
+  const res = data?.list_course?.map((item: any) => {
+    return {
+      email: data?.email,
+      course_id: item?.course_id,
+    };
+  });
+  return res;
+};
+
 const AddOrder = async (req: Request, res: Response) => {
   try {
     const orderData = req.body;
@@ -47,6 +79,8 @@ const AddOrder = async (req: Request, res: Response) => {
       is_purchase: false,
     });
     if (result) {
+      const listMyCourse = formatMyCourse(orderData);
+      await myCourse.create([...listMyCourse]);
       return res.status(200).json({
         errCode: 0,
         errMessage: "Thêm đơn hàng thành công!",
@@ -86,7 +120,7 @@ const editOrder = async (req: Request, res: Response) => {
     const orderData = req.body;
     const result = await Order.findOne({
       email: orderData.email,
-      _id: orderData.orderId,
+      _id: orderData.order_id,
     });
     if (result) {
       if (orderData.list_course) result.list_course = orderData.list_course;
@@ -110,6 +144,7 @@ const editOrder = async (req: Request, res: Response) => {
 
 const orderController = {
   getAllOrder,
+  getDetailOrder,
   AddOrder,
   deleteOrder,
   editOrder,

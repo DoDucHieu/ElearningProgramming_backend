@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const commentSchema = new Schema(
   {
-    email: { type: String, required: true, ref: "users" },
+    user_id: { type: String, required: true, ref: "users" },
     comment: { type: String, required: true },
     type: { type: String, required: true },
     video_id: { type: String },

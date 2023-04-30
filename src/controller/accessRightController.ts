@@ -1,4 +1,4 @@
-import AccessRight from "../model/history";
+import AccessRight from "../model/accessRight";
 import { Request, Response } from "express";
 
 const getAllAccessRight = async (req: Request, res: Response) => {

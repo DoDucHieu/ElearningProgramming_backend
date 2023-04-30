@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../model/user";
-import AccessRight from "../model/history";
+import AccessRight from "../model/accessRight";
 import { Request, Response } from "express";
 
 export const generateToken = (payload: any) => {
@@ -111,6 +111,7 @@ const signIn = async (req: Request, res: Response) => {
         return res.status(200).json({
           errCode: 0,
           errMessage: "Sign in success",
+          user_id: checkExist._id,
           email: userData.email,
           role: checkExist.role,
           fullName: checkExist.fullName,
@@ -170,6 +171,7 @@ const refreshToken = async (req: Request, res: Response) => {
       record.refreshToken = token.refreshToken;
       await record.save();
       const userDataRes = {
+        user_id: record.userId,
         email: decode.email,
         role: decode.role,
         fullName: decode.fullName,
@@ -227,6 +229,7 @@ const changePassword = async (req: Request, res: Response) => {
         return res.status(200).json({
           errCode: 0,
           errMessage: "Change password success",
+          user_id: checkExist._id,
           email: userData.email,
           role: checkExist.role,
           fullName: checkExist.fullName,

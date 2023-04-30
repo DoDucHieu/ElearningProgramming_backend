@@ -9,21 +9,21 @@ const getAllComment = async (req: Request, res: Response) => {
   try {
     const data = req.query;
     let result = null;
-    result = await Comment.find({
-      new_id: data._id,
-    });
+    // result = await Comment.find({
+    //   new_id: data._id,
+    // });
     if (data.type === "new") {
       result = await Comment.find({
         new_id: data._id,
-      }).populate("email", { createdAt: 0, updatedAt: 0 });
+      }).populate("user_id", { createdAt: 0, updatedAt: 0 });
     } else if (data.type === "video") {
       result = await Comment.find({
         video_id: data._id,
-      });
+      }).populate("user_id", { createdAt: 0, updatedAt: 0 });
     } else if (data.type === "lesson") {
       result = await Comment.find({
         lesson_id: data._id,
-      });
+      }).populate("user_id", { createdAt: 0, updatedAt: 0 });
     } else {
       result = await Comment.find({});
     }
@@ -44,7 +44,7 @@ const getAllComment = async (req: Request, res: Response) => {
 const addComment = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const user = await User.findOne({ email: data.email });
+    const user = await User.findOne({ _id: data.user_id });
     let check = null;
     let new_id = null;
     let video_id = null;
@@ -63,7 +63,7 @@ const addComment = async (req: Request, res: Response) => {
     }
     if (user && check) {
       const result = await Comment.create({
-        email: data.email,
+        user_id: data.user_id,
         type: data.type,
         new_id,
         video_id,
@@ -72,13 +72,13 @@ const addComment = async (req: Request, res: Response) => {
       });
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Add comment success!",
+        errMessage: "Thêm bình luận thành công!",
         data: result,
       });
     } else {
-      return res.status(200).json({
+      return res.status(500).json({
         errCode: 1,
-        errMessage: "User or product not found!",
+        errMessage: "Người dùng hoặc bài đăng không tồn tại!",
       });
     }
   } catch (e) {
@@ -93,7 +93,7 @@ const editComment = async (req: Request, res: Response) => {
   try {
     const data = req.body;
     let result = await Comment.findOne({
-      email: data.email,
+      user_id: data.user_id,
       new_id: data.new_id ?? null,
       video_id: data.video_id ?? null,
       lesson_id: data.lesson_id ?? null,
@@ -104,7 +104,7 @@ const editComment = async (req: Request, res: Response) => {
       await result.save();
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Update comment success!",
+        errMessage: "Chỉnh sửa bình luận thành công!",
         data: result,
       });
     }
@@ -120,7 +120,7 @@ const deleteComment = async (req: Request, res: Response) => {
   try {
     const data = req.body;
     const result = await Comment.findOneAndDelete({
-      email: data.email,
+      user_id: data.user_id,
       new_id: data.new_id ?? null,
       video_id: data.video_id ?? null,
       lesson_id: data.lesson_id ?? null,
@@ -128,7 +128,7 @@ const deleteComment = async (req: Request, res: Response) => {
     });
     return res.status(200).json({
       errCode: 0,
-      errMessage: "Delete comment success!",
+      errMessage: "Xóa bình luận thành công!",
       data: result,
     });
   } catch (e) {

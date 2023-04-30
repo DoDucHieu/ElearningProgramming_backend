@@ -7,20 +7,61 @@ const getAllCourse = async (req: Request, res: Response) => {
     const size: number = Number(req.query.size);
     const keyword: any = req.query.keyword || "";
     const sort: any = req.query.sort || "createdAt";
+    const filterPrice: any = req.query.filter || undefined;
+    let minPrice: number = undefined;
+    let maxPrice: number = undefined;
+
+    if (filterPrice) {
+      minPrice = JSON.parse(filterPrice)?.minPrice;
+      maxPrice = JSON.parse(filterPrice)?.maxPrice;
+    }
+
+    console.log("filter: ", minPrice, maxPrice);
     let totalRecord = null;
 
-    const result = await Course.find({ $or: [{ name: { $regex: keyword } }] })
+    const result = await Course.find({
+      $or: [{ name: { $regex: keyword } }],
+      $and: [
+        {
+          ...(minPrice !== undefined && {
+            price: {
+              $gt: minPrice,
+            },
+          }),
+        },
+        {
+          ...(maxPrice !== undefined && {
+            price: {
+              $lte: maxPrice,
+            },
+          }),
+        },
+      ],
+    })
       .sort({ [sort]: -1 })
       .skip(size * (page - 1))
       .limit(size);
 
-    if (keyword)
+    if (keyword || filterPrice)
       totalRecord = await Course.count({
         $or: [{ name: { $regex: keyword } }],
-      })
-        .sort({ [sort]: -1 })
-        .skip(size * (page - 1))
-        .limit(size);
+        $and: [
+          {
+            ...(minPrice !== undefined && {
+              price: {
+                $gt: minPrice,
+              },
+            }),
+          },
+          {
+            ...(maxPrice !== undefined && {
+              price: {
+                $lte: maxPrice,
+              },
+            }),
+          },
+        ],
+      }).sort({ [sort]: -1 });
     else totalRecord = await Course.count({});
 
     if (result) {
@@ -134,13 +175,24 @@ const editCourse = async (req: Request, res: Response) => {
   }
 };
 
+const formatListCourseId = (data: any) => {
+  const res = data?.map((item: any) => {
+    return item?.course_id;
+  });
+  return res;
+};
+
 const increaseRegistryCourse = async (req: Request, res: Response) => {
   try {
-    const data = req.body;
-    const result = await Course.findById({ _id: data._id });
+    const listCourse = req.body.list_course;
+    const listCourseId = formatListCourseId(listCourse);
+    const result = await Course.updateMany(
+      {
+        _id: { $in: [...listCourseId] },
+      },
+      { $inc: { number_registry: 1 } }
+    );
     if (result) {
-      result.number_registry += 1;
-      await result.save();
       return res.status(200).json({
         errCode: 0,
         errMessage: "Tăng số lượt đăng ký khóa học thành công!",

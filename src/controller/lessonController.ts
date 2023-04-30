@@ -20,9 +20,7 @@ const getAllLesson = async (req: Request, res: Response) => {
       totalRecord = await Lesson.count({
         $or: [{ name: { $regex: keyword } }],
         course_id,
-      })
-        .skip(size * (page - 1))
-        .limit(size);
+      });
     else totalRecord = await Lesson.count({});
 
     if (result) {

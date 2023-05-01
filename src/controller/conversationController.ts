@@ -79,15 +79,25 @@ const deleteConversation = async (req: Request, res: Response) => {
 const addConversation = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const result = await Conversation.create({
-      members: [data.sender_id, data.receiver_id],
+    const check = await Conversation.find({
+      members: { $in: [data.sender_id, data.receiver_id] },
     });
-
-    return res.status(200).json({
-      errCode: 0,
-      errMessage: "Thêm đoạn hội thoại thành công!",
-      data: result,
-    });
+    if (check)
+      return res.status(200).json({
+        errCode: 1,
+        errMessage: "Cuộc hội thoại này đã tồn tại",
+      });
+    else {
+      const result = await Conversation.create({
+        members: [data.sender_id, data.receiver_id],
+      });
+      if (result)
+        return res.status(200).json({
+          errCode: 0,
+          errMessage: "Thêm đoạn hội thoại thành công!",
+          data: result,
+        });
+    }
   } catch (e) {
     return res.status(500).json({
       errCode: 1,

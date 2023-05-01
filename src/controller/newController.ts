@@ -9,6 +9,7 @@ const getAllNew = async (req: Request, res: Response) => {
     let totalRecord = null;
 
     const result = await New.find({ $or: [{ name: { $regex: keyword } }] })
+      .populate("author", { createdAt: 0, updatedAt: 0 })
       .skip(size * (page - 1))
       .limit(size);
 
@@ -39,7 +40,10 @@ const getAllNew = async (req: Request, res: Response) => {
 const getDetailNew = async (req: Request, res: Response) => {
   try {
     const _id = req.query._id;
-    const result = await New.findById({ _id });
+    const result = await New.findById({ _id }).populate("author", {
+      createdAt: 0,
+      updatedAt: 0,
+    });
     if (result) {
       return res.status(200).json({
         errCode: 0,

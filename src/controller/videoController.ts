@@ -8,6 +8,10 @@ const getAllVideo = async (req: Request, res: Response) => {
     const keyword: any = req.query.keyword || "";
     let totalRecord = null;
     const result = await Video.find({ $or: [{ name: { $regex: keyword } }] })
+      .populate("author", {
+        createdAt: 0,
+        updatedAt: 0,
+      })
       .skip(size * (page - 1))
       .limit(size);
 
@@ -38,7 +42,10 @@ const getAllVideo = async (req: Request, res: Response) => {
 const getDetailVideo = async (req: Request, res: Response) => {
   try {
     const _id = req.query._id;
-    const result = await Video.findById({ _id });
+    const result = await Video.findById({ _id }).populate("author", {
+      createdAt: 0,
+      updatedAt: 0,
+    });
     if (result) {
       return res.status(200).json({
         errCode: 0,

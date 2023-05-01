@@ -5,7 +5,7 @@ const videoSchema = new Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
-    author: { type: String, required: true },
+    author: { type: String, required: true, ref: "users" },
     img_url: { type: String, required: true },
     video_url: { type: String, required: true },
     is_approved: { type: Boolean, required: true },

@@ -41,6 +41,8 @@ const handleConnect = (io: any) => {
 
     handleAddUser(io, socket);
     handleSendMessage(io, socket);
+    handleMakeVideoCall(io, socket);
+    makeAcceptVideoCall(io, socket);
   });
 };
 
@@ -48,7 +50,7 @@ const handleAddUser = (io: any, socket: any) => {
   //take userId and socketId from user
   socket.on("addUser", (userId: string) => {
     addUser(userId, socket.id);
-    console.log("list user: ", users);
+    console.log("Danh sách user: ", users);
     io.emit("getUsers", users);
   });
 };
@@ -63,6 +65,24 @@ const handleSendMessage = (io: any, socket: any) => {
       senderId,
       text,
     });
+  });
+};
+
+const handleMakeVideoCall = (io: any, socket: any) => {
+  socket.on("makeVideoCall", ({ sender_id, receiver_id }: any) => {
+    console.log(
+      `Người dùng ${sender_id} đang gọi video cho người dùng ${receiver_id}`
+    );
+    io.sockets.emit(`getVideoCall${receiver_id}`, sender_id);
+  });
+};
+
+const makeAcceptVideoCall = (io: any, socket: any) => {
+  socket.on("makeAcceptVideoCall", ({ user_id, peer }: any) => {
+    console.log(
+      `Người dùng ${user_id} có peerID là ${peer} vừa chấp nhận cuộc gọi video`
+    );
+    io.sockets.emit(`getAcceptVideoCall$${user_id}`, peer);
   });
 };
 

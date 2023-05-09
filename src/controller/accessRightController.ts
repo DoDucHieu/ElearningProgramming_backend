@@ -91,8 +91,7 @@ const updateAccessRight = async (req: Request, res: Response) => {
     const data = req.body;
     const result = await AccessRight.findById({ _id: data.id });
     if (result) {
-      result.isBlocked = data.isBlocked;
-      await result.save();
+      // await result.save();
       return res.status(200).json({
         errCode: 0,
         errMessage: "Update access right success!",

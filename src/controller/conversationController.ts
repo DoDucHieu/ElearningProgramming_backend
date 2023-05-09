@@ -63,10 +63,10 @@ const deleteConversation = async (req: Request, res: Response) => {
     if (result) {
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Xóa bài đăng thành công!",
+        errMessage: "Xóa đoạn hội thoại thành công!",
       });
     } else {
-      throw new Error("Bài đăng không tồn tại!");
+      throw new Error("Đoạn hội thoại không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -79,10 +79,12 @@ const deleteConversation = async (req: Request, res: Response) => {
 const addConversation = async (req: Request, res: Response) => {
   try {
     const data = req.body;
+    console.log("member: ", data);
+
     const check = await Conversation.find({
       members: { $in: [data.sender_id, data.receiver_id] },
     });
-    if (check)
+    if (check.length > 0)
       return res.status(200).json({
         errCode: 1,
         errMessage: "Cuộc hội thoại này đã tồn tại",

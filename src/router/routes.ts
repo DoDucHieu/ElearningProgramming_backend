@@ -1,12 +1,9 @@
 import { Express, Request, Response } from "express";
 import middleWare from "../middleware/middleware";
-import productController from "../controller/productController";
 import userController from "../controller/userController";
 import authController from "../controller/authController";
 import cartController from "../controller/cartController";
 import commentController from "../controller/commentController";
-import assessmentController from "../controller/assessmentController";
-import categoryController from "../controller/categoryController";
 import accessRightController from "../controller/accessRightController";
 import newController from "../controller/newController";
 import videoController from "../controller/videoController";
@@ -32,25 +29,6 @@ const routes = (app: Express) => {
     "/change-password",
     middleWare.verifyToken,
     authController.changePassword
-  );
-
-  //product api
-  app.get("/get-all-product", productController.getAllProduct);
-  app.get("/get-detail-product", productController.getDetailProduct);
-  app.delete(
-    "/delete-product",
-    middleWare.verifyToken,
-    productController.deleteProduct
-  );
-  app.post(
-    "/add-product",
-    middleWare.verifyToken,
-    productController.addProduct
-  );
-  app.put(
-    "/update-product",
-    middleWare.verifyToken,
-    productController.updateProduct
   );
 
   //user api
@@ -150,47 +128,6 @@ const routes = (app: Express) => {
     "/delete-comment",
     middleWare.verifyToken,
     commentController.deleteComment
-  );
-
-  //assessment api
-  app.get(
-    "/get-all-assessment",
-    middleWare.verifyToken,
-    assessmentController.getAllAssessmentByProductId
-  );
-  app.post(
-    "/add-assessment",
-    middleWare.verifyToken,
-    assessmentController.addAssessment
-  );
-  app.put(
-    "/update-assessment",
-    middleWare.verifyToken,
-    assessmentController.updateAssessment
-  );
-  app.delete(
-    "/delete-assessment",
-    middleWare.verifyToken,
-    assessmentController.deleteAssessment
-  );
-
-  //category api
-  app.get("/get-all-category", categoryController.getAllCategory);
-  app.get("/get-detail-category", categoryController.getDetailCategory);
-  app.post(
-    "/add-category",
-    middleWare.verifyToken,
-    categoryController.createCategory
-  );
-  app.put(
-    "/update-category",
-    middleWare.verifyToken,
-    categoryController.updateCategory
-  );
-  app.delete(
-    "/delete-category",
-    middleWare.verifyToken,
-    categoryController.deleteCategory
   );
 
   // access right api

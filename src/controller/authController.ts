@@ -33,7 +33,7 @@ const signUp = async (req: Request, res: Response) => {
     let userData = req.body;
     const checkExist = await User.findOne({ email: userData.email });
     if (checkExist) {
-      throw new Error("This user name is already exists!");
+      throw new Error("Email không tồn tại!");
     } else {
       const salt = await bcrypt.genSalt(10);
       let hashPassword = await bcrypt.hash(userData.password, salt);
@@ -57,7 +57,7 @@ const signUp = async (req: Request, res: Response) => {
         });
         return res.status(200).json({
           errCode: 0,
-          errMessage: "Create new account success",
+          errMessage: "Tạo mới tài khoản thành công!",
           userInfor: result,
           accessToken,
           refreshToken,
@@ -82,7 +82,7 @@ const signIn = async (req: Request, res: Response) => {
       if (checkExist.is_blocked)
         return res.status(200).json({
           errCode: 1,
-          errMessage: "This account has been blocked!",
+          errMessage: "Tài khoản này đã bị vô hiệu hóa!",
         });
       const compare = await comparePassword(
         userData.password,
@@ -110,7 +110,7 @@ const signIn = async (req: Request, res: Response) => {
           });
         return res.status(200).json({
           errCode: 0,
-          errMessage: "Sign in success",
+          errMessage: "Đăng nhập thành công",
           user_id: checkExist._id,
           email: userData.email,
           role: checkExist.role,
@@ -120,10 +120,10 @@ const signIn = async (req: Request, res: Response) => {
           refreshToken,
         });
       } else {
-        throw new Error("Password incorrect!");
+        throw new Error("Mật khẩu không đúng!");
       }
     } else {
-      throw new Error("Email incorrect!");
+      throw new Error("Email không đúng!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -142,7 +142,7 @@ const signOut = async (req: Request, res: Response) => {
       record.accessToken = null;
       record.refreshToken = null;
       await record.save();
-      return res.status(200).json({ message: "Log out success!" });
+      return res.status(200).json({ message: "Đăng xuất thành công!" });
     } else return res.sendStatus(403);
   } catch (e) {
     return res.status(500).json({
@@ -180,7 +180,7 @@ const refreshToken = async (req: Request, res: Response) => {
       };
       return res
         .status(200)
-        .json({ message: "Refresh token success!", data: userDataRes });
+        .json({ message: "Refresh token thành công!", data: userDataRes });
     } else return res.sendStatus(403);
   } catch (e) {
     return res.status(500).json({
@@ -228,7 +228,7 @@ const changePassword = async (req: Request, res: Response) => {
           });
         return res.status(200).json({
           errCode: 0,
-          errMessage: "Change password success",
+          errMessage: "Đổi mật khẩu thành công",
           user_id: checkExist._id,
           email: userData.email,
           role: checkExist.role,
@@ -237,10 +237,10 @@ const changePassword = async (req: Request, res: Response) => {
           refreshToken,
         });
       } else {
-        throw new Error("Password incorrect!");
+        throw new Error("Mật khẩu không đúng!");
       }
     } else {
-      throw new Error("Email incorrect!");
+      throw new Error("Email không đúng!");
     }
   } catch (e) {
     return res.status(500).json({

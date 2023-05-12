@@ -10,7 +10,7 @@ const getAllCartByEmail = async (req: Request, res: Response) => {
     ).populate("course_id", { createdAt: 0, updatedAt: 0 });
     return res.status(200).json({
       errCode: 0,
-      errMessage: "Get all cart success!",
+      errMessage: "Lấy tất cả giỏ hàng thành công!",
       data: result,
     });
   } catch (e) {

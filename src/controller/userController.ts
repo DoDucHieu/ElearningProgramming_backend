@@ -110,7 +110,7 @@ const addUser = async (req: Request, res: Response) => {
       if (result) {
         return res.status(200).json({
           errCode: 0,
-          errMessage: "Add new user success",
+          errMessage: "Thêm người dùng thành công!",
           userInfor: result,
         });
       }
@@ -135,11 +135,11 @@ const editUser = async (req: Request, res: Response) => {
       await user.save();
       return res.status(200).json({
         errCode: 0,
-        errMessage: "Edit user success",
+        errMessage: "Cập nhật người dùng thành công!",
         data: user,
       });
     } else {
-      throw new Error("This user is not exists!");
+      throw new Error("Người dùng không tồn tại!");
     }
   } catch (e) {
     return res.status(500).json({
@@ -153,8 +153,9 @@ const deleteUser = async (req: Request, res: Response) => {
   try {
     let id = req.query.id;
     const user = await User.deleteOne({ _id: id });
-    if (user) return res.status(200).json({ message: `Delete user success!` });
-    else throw new Error("This user is not exists!");
+    if (user)
+      return res.status(200).json({ message: `Xóa người dùng thành công!` });
+    else throw new Error("Người dùng không tồn tại!");
   } catch (e) {
     return res.status(500).json({
       errCode: 1,
@@ -175,16 +176,16 @@ const blockUser = async (req: Request, res: Response) => {
         return res.status(200).json({
           errCode: 0,
           message: is_blocked
-            ? "Block account success!"
-            : "Unlock account success!",
+            ? "Chặn người dùng thành công!"
+            : "Bỏ chặn người dùng thành công!",
         });
       } else {
         return res.status(500).json({
           errorCode: 1,
-          message: "You can not block admin account!",
+          message: "Bạn không thể chặn tài khoản admin!",
         });
       }
-    } else throw new Error("This user is not exists!");
+    } else throw new Error("Người dùng không tồn tại!");
   } catch (e) {
     return res.status(500).json({
       errCode: 1,

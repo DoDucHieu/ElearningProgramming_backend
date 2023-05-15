@@ -10,6 +10,7 @@ const getAllConversation = async (req: Request, res: Response) => {
     const result = await Conversation.find({
       members: { $in: [req.query.user_id] },
     })
+      .sort({ createdAt: -1 })
       .skip(size * (page - 1))
       .limit(size);
 
@@ -82,14 +83,17 @@ const addConversation = async (req: Request, res: Response) => {
     console.log("member: ", data);
 
     const check = await Conversation.find({
-      members: { $in: [data.sender_id, data.receiver_id] },
+      members: { $all: [data.sender_id, data.receiver_id] },
     });
-    if (check.length > 0)
+    if (check.length > 0) {
+      console.log("check : ", check);
+
       return res.status(200).json({
         errCode: 1,
         errMessage: "Cuộc hội thoại này đã tồn tại",
+        result: check,
       });
-    else {
+    } else {
       const result = await Conversation.create({
         members: [data.sender_id, data.receiver_id],
       });
@@ -97,7 +101,7 @@ const addConversation = async (req: Request, res: Response) => {
         return res.status(200).json({
           errCode: 0,
           errMessage: "Thêm đoạn hội thoại thành công!",
-          data: result,
+          result,
         });
     }
   } catch (e) {

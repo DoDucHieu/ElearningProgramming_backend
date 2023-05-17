@@ -24,8 +24,8 @@ const removeUser = (socketId: string) => {
   users = users.filter((user: UserType) => user.socketId !== socketId);
 };
 
-const getUser = (userId: string) => {
-  return users.find((user: UserType) => user.userId === userId);
+const getUser = (socketId: string) => {
+  return users.find((user: UserType) => user.socketId === socketId);
 };
 
 const handleConnect = (io: any) => {
@@ -35,7 +35,11 @@ const handleConnect = (io: any) => {
 
     //when disconnect
     socket.on("disconnect", () => {
-      console.log("Người dùng vừa ngắt kết nối:", socket.id);
+      console.log("Người dùng vừa ngắt kết nối:", getUser(socket.id));
+      const userId = getUser(socket.id)?.userId;
+      if (userId) {
+        io.sockets.emit(`userDisconnect${userId}`, userId);
+      }
       removeUser(socket.id);
     });
 
@@ -43,6 +47,9 @@ const handleConnect = (io: any) => {
     handleSendMessage(io, socket);
     handleMakeVideoCall(io, socket);
     makeAcceptVideoCall(io, socket);
+    makeDeclineVideoCall(io, socket);
+    makeEndCall(io, socket);
+    makeShowHideCamera(io, socket);
   });
 };
 
@@ -82,7 +89,28 @@ const makeAcceptVideoCall = (io: any, socket: any) => {
     console.log(
       `Người dùng ${user_id} có peerID là ${peer} vừa chấp nhận cuộc gọi video`
     );
-    io.sockets.emit(`getAcceptVideoCall$${user_id}`, peer);
+    io.sockets.emit(`getAcceptVideoCall${user_id}`, peer);
+  });
+};
+
+const makeDeclineVideoCall = (io: any, socket: any) => {
+  socket.on("makeDeclineVideoCall", (user_id: string) => {
+    console.log("Người dùng từ chối call video: ", user_id);
+    io.sockets.emit(`getDeclineVideoCall${user_id}`, user_id);
+  });
+};
+
+const makeEndCall = (io: any, socket: any) => {
+  socket.on("makeEndCall", (user_id: string) => {
+    console.log("Người dùng kết thúc call video: ", user_id);
+    io.sockets.emit(`getEndCall${user_id}`, user_id);
+  });
+};
+
+const makeShowHideCamera = (io: any, socket: any) => {
+  socket.on("makeShowHideCamera", ({ user_id, value }: any) => {
+    console.log(`Người dùng điều chỉnh camera thành ${value} : `, user_id);
+    io.sockets.emit(`getShowHideCamera${user_id}`, { user_id, value });
   });
 };
 

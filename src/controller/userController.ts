@@ -167,7 +167,9 @@ const deleteUser = async (req: Request, res: Response) => {
 const blockUser = async (req: Request, res: Response) => {
   try {
     const email = req.body.email;
-    const is_blocked = req.body.is_blocked;
+    const is_blocked = req.body.isBlock;
+    console.log("req: ", is_blocked);
+
     const user = await User.findOne({ email: email });
     if (user) {
       if (user.role !== "admin") {
